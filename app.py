@@ -56,12 +56,22 @@ st.markdown("""
 
 # Initialize session state
 if 'agent' not in st.session_state:
-    # Get API key from environment or secrets
-    api_key = os.getenv('GEMINI_API_KEY') or st.secrets.get('GEMINI_API_KEY', '')
-    if api_key:
-        st.session_state.agent = InterviewAgent(api_key)
-    else:
-        st.session_state.agent = None
+    # Get API key from multiple sources
+    api_key = os.getenv('GEMINI_API_KEY', '')
+    
+    if not api_key:
+        try:
+            api_key = st.secrets.get('GEMINI_API_KEY', '')
+        except:
+            pass
+    
+    if not api_key:
+        st.error("⚠️ API key not configured. Please add your Gemini API key.")
+        st.info("Get your free API key from: https://makersuite.google.com/app/apikey")
+        st.stop()
+    
+    # Initialize the agent with the API key
+    st.session_state.agent = InterviewAgent(api_key)
 
 if 'questions' not in st.session_state:
     st.session_state.questions = []
@@ -149,24 +159,20 @@ if not st.session_state.session_started:
     st.markdown("---")
     
     if st.button("🎯 Start Interview Practice", type="primary", use_container_width=True):
-        if st.session_state.agent is None:
-            st.error("⚠️ API key not configured. Please add your Gemini API key to continue.")
-            st.info("You can get a free API key from: https://makersuite.google.com/app/apikey")
-        else:
-            with st.spinner("Generating interview questions..."):
-                questions = st.session_state.agent.generate_questions(
-                    role, difficulty, num_questions
-                )
-                if questions:
-                    st.session_state.questions = questions
-                    st.session_state.role = role
-                    st.session_state.difficulty = difficulty
-                    st.session_state.session_started = True
-                    st.session_state.current_q_index = 0
-                    st.session_state.answers = []
-                    st.rerun()
-                else:
-                    st.error("Failed to generate questions. Please try again.")
+        with st.spinner("Generating interview questions..."):
+            questions = st.session_state.agent.generate_questions(
+                role, difficulty, num_questions
+            )
+            if questions:
+                st.session_state.questions = questions
+                st.session_state.role = role
+                st.session_state.difficulty = difficulty
+                st.session_state.session_started = True
+                st.session_state.current_q_index = 0
+                st.session_state.answers = []
+                st.rerun()
+            else:
+                st.error("Failed to generate questions. Please try again.")
 
 elif not st.session_state.session_completed:
     # Interview in progress
@@ -238,7 +244,8 @@ elif not st.session_state.session_completed:
                     st.rerun()
     
     # Show previous answer feedback if available
-    if st.session_state.answers and len(st.session_state.answers) > st.session_state.current_q_index:
+    if st.session_state.answers and len(st.session_state.answers) > 0:
+        # Show the most recent answer feedback
         prev = st.session_state.answers[-1]
         if prev.get('score', 0) > 0:
             st.markdown("---")
