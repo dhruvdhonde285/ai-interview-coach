@@ -1,0 +1,34 @@
+# 🎯 AI Interview Coach
+
+An AI-powered mock interview platform that helps students practice role-specific interview questions with instant feedback and personalized improvement suggestions.
+
+## ✨ Features
+
+- **Role-Specific Questions**: Practice for Python Developer, Data Scientist, Web Developer, and more
+- **Difficulty Levels**: Beginner, Intermediate, Advanced to match your experience
+- **Instant Feedback**: Get scores and constructive feedback on every answer
+- **Improved Answers**: See how to structure better responses
+- **Session Summary**: Receive comprehensive analysis of strengths and areas to improve
+- **Zero Cost**: Free to use with Gemini API
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.8+
+- Gemini API Key (free from makersuite.google.com/app/apikey)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/ai-interview-coach.git
+cd ai-interview-coach
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up API key
+echo "GEMINI_API_KEY=your_api_key_here" > .env
+
+# Run the app
+streamlit run app.py
